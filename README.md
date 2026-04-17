@@ -43,3 +43,5 @@ Backend por defecto en `http://localhost:3001`.
 1. Conectar `FrontSaas` a `/api/projects` para consumir datos reales.
 2. Crear el modulo real de cada demo (almacen, peluqueria, etc).
 3. Agregar autenticacion simple para modo admin/comercial.
+
+# MiniSaaS
