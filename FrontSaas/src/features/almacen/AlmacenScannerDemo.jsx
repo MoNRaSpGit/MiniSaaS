@@ -15,6 +15,55 @@ function getNowLabel() {
   return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
+const KNOWN_PRODUCTS = {
+  "5455345": { name: "Galletitas Mix Crocante 170g", price: 1290 },
+  "7791234567890": { name: "Yerba Serrana Suave 1kg", price: 2980 },
+  "7501031311309": { name: "Jabon Liquido Fresh 500ml", price: 1840 }
+};
+
+const BRANDS = ["Norte", "Del Valle", "Maxi", "Urbano", "Don", "Prime", "Eco"];
+const ITEMS = [
+  "Arroz Integral 1kg",
+  "Pasta Fusilli 500g",
+  "Leche Entera 1L",
+  "Atun en Agua 170g",
+  "Cafe Molido 250g",
+  "Jugo Naranja 1L",
+  "Pan Lactal Blanco",
+  "Detergente Limon 750ml",
+  "Papel Higienico x4",
+  "Gaseosa Cola 2.25L"
+];
+
+function hashCode(value) {
+  return value.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
+}
+
+function formatCurrency(value) {
+  return new Intl.NumberFormat("es-UY", {
+    style: "currency",
+    currency: "UYU",
+    maximumFractionDigits: 0
+  }).format(value);
+}
+
+function getDemoProductFromCode(code) {
+  if (KNOWN_PRODUCTS[code]) {
+    return { ...KNOWN_PRODUCTS[code], code };
+  }
+
+  const hash = hashCode(code);
+  const brand = BRANDS[hash % BRANDS.length];
+  const item = ITEMS[hash % ITEMS.length];
+  const price = 990 + ((hash % 26) + 1) * 120;
+
+  return {
+    code,
+    name: `${brand} ${item}`,
+    price
+  };
+}
+
 export function AlmacenScannerDemo() {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
@@ -27,16 +76,32 @@ export function AlmacenScannerDemo() {
   const [cameraError, setCameraError] = useState("");
   const [scanMessage, setScanMessage] = useState("Listo para escanear.");
   const [lastCode, setLastCode] = useState("");
-  const [history, setHistory] = useState([]);
+  const [cart, setCart] = useState([]);
   const [manualCode, setManualCode] = useState("");
 
   const isSupported = useMemo(() => {
     return typeof window !== "undefined" && "BarcodeDetector" in window;
   }, []);
 
-  const addHistoryItem = (value, source = "camera") => {
+  const registerCode = (value, source = "camera") => {
+    const product = getDemoProductFromCode(value);
+
     setLastCode(value);
-    setHistory((prev) => [{ value, source, at: getNowLabel() }, ...prev].slice(0, 8));
+
+    setCart((prev) => {
+      const existing = prev.find((item) => item.code === value);
+      if (!existing) {
+        return [{ ...product, qty: 1, source, at: getNowLabel() }, ...prev];
+      }
+
+      return prev.map((item) =>
+        item.code === value
+          ? { ...item, qty: item.qty + 1, source, at: getNowLabel() }
+          : item
+      );
+    });
+
+    setScanMessage(`Agregado: ${product.name} - ${formatCurrency(product.price)}`);
   };
 
   const stopScanLoop = () => {
@@ -79,8 +144,7 @@ export function AlmacenScannerDemo() {
         if (isNewValue || enoughTimePassed) {
           lastValueRef.current = rawValue;
           lastReadAtRef.current = now;
-          addHistoryItem(rawValue, "camera");
-          setScanMessage(`Codigo detectado: ${rawValue}`);
+          registerCode(rawValue, "camera");
 
           if ("vibrate" in navigator) {
             navigator.vibrate(80);
@@ -145,9 +209,17 @@ export function AlmacenScannerDemo() {
     if (!value) {
       return;
     }
-    addHistoryItem(value, "manual");
-    setScanMessage(`Codigo cargado manualmente: ${value}`);
+    registerCode(value, "manual");
     setManualCode("");
+  };
+
+  const totalItems = cart.reduce((acc, item) => acc + item.qty, 0);
+  const totalAmount = cart.reduce((acc, item) => acc + item.qty * item.price, 0);
+
+  const clearCart = () => {
+    setCart([]);
+    setLastCode("");
+    setScanMessage("Caja reiniciada. Listo para escanear.");
   };
 
   useEffect(() => {
@@ -208,21 +280,42 @@ export function AlmacenScannerDemo() {
       </div>
 
       <div className="history-panel">
-        <p className="result-title">Lecturas recientes</p>
-        {history.length === 0 ? (
-          <p className="history-empty">Todavia no hay lecturas.</p>
+        <div className="cart-headline">
+          <p className="result-title">Ticket de compra</p>
+          <button type="button" className="mini-btn" onClick={clearCart}>
+            Limpiar
+          </button>
+        </div>
+
+        {cart.length === 0 ? (
+          <p className="history-empty">Escanea productos para armar la compra.</p>
         ) : (
-          <ul>
-            {history.map((item, index) => (
-              <li key={`${item.value}-${item.at}-${index}`}>
-                <strong>{item.value}</strong>
-                <span>
-                  {item.source} - {item.at}
-                </span>
+          <ul className="cart-list">
+            {cart.map((item) => (
+              <li key={item.code}>
+                <div>
+                  <strong>{item.name}</strong>
+                  <span>
+                    Cod: {item.code} - {item.source} - {item.at}
+                  </span>
+                </div>
+                <div className="cart-item-price">
+                  <small>x{item.qty}</small>
+                  <strong>{formatCurrency(item.qty * item.price)}</strong>
+                </div>
               </li>
             ))}
           </ul>
         )}
+
+        <div className="cart-summary">
+          <p>
+            Items: <strong>{totalItems}</strong>
+          </p>
+          <p className="cart-total">
+            Total: <strong>{formatCurrency(totalAmount)}</strong>
+          </p>
+        </div>
       </div>
     </section>
   );
