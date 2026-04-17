@@ -419,30 +419,13 @@ export function AlmacenScannerDemo() {
     setThemeIndex((prev) => (prev + 1) % UX_THEMES.length);
   };
 
-  const printTicketRawBt = async (movement) => {
+  const printTicketRawBt = (movement) => {
     if (!movement || typeof window === "undefined") {
       return;
     }
 
     const rawText = buildPlainTicket(movement);
     setScanMessage("Enviando ticket a RawBT...");
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: "Ticket SCANER",
-          text: rawText
-        });
-        setScanMessage("Ticket compartido. Selecciona RawBT para imprimir.");
-        return;
-      } catch (error) {
-        if (error?.name === "AbortError") {
-          setScanMessage("Impresion cancelada.");
-          return;
-        }
-      }
-    }
-
     const encodedText = encodeURIComponent(rawText);
     const rawbtUrl = `rawbt://print?text=${encodedText}`;
     try {
