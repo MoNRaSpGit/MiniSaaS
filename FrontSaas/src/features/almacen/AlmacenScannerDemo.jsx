@@ -68,6 +68,15 @@ function formatIncomeAmount(value) {
   return `+$ ${amount}`;
 }
 
+function escapeHtml(value) {
+  return value
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
 function getDemoProductFromCode(code) {
   if (KNOWN_PRODUCTS[code]) {
     return { ...KNOWN_PRODUCTS[code], code };
@@ -326,6 +335,88 @@ export function AlmacenScannerDemo() {
     setThemeIndex((prev) => (prev + 1) % UX_THEMES.length);
   };
 
+  const printTicket = (movement) => {
+    if (!movement || typeof window === "undefined") {
+      return;
+    }
+
+    const rows = movement.products
+      .map(
+        (product) => `
+          <tr>
+            <td>${escapeHtml(`${product.qty}x ${product.name}`)}</td>
+            <td style="text-align:right">${escapeHtml(formatCurrency(product.subtotal))}</td>
+          </tr>
+        `
+      )
+      .join("");
+
+    const html = `
+      <!doctype html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>Ticket</title>
+          <style>
+            body {
+              margin: 0;
+              font-family: monospace;
+              color: #111;
+              background: #fff;
+            }
+            .ticket {
+              width: 280px;
+              margin: 0 auto;
+              padding: 10px;
+            }
+            .center { text-align: center; }
+            .line { border-top: 1px dashed #111; margin: 8px 0; }
+            table { width: 100%; border-collapse: collapse; font-size: 12px; }
+            td { padding: 2px 0; vertical-align: top; }
+            .total { font-weight: 700; font-size: 14px; }
+          </style>
+        </head>
+        <body>
+          <div class="ticket">
+            <div class="center">
+              <strong>SCANER</strong><br/>
+              Ticket de venta
+            </div>
+            <div class="line"></div>
+            <div>Fecha: ${escapeHtml(movement.at)}</div>
+            <div class="line"></div>
+            <table>
+              <tbody>
+                ${rows}
+              </tbody>
+            </table>
+            <div class="line"></div>
+            <table>
+              <tr class="total">
+                <td>Total</td>
+                <td style="text-align:right">${escapeHtml(formatCurrency(movement.amount))}</td>
+              </tr>
+            </table>
+            <div class="center" style="margin-top:10px">Gracias por su compra</div>
+          </div>
+          <script>
+            window.onload = () => {
+              window.print();
+            };
+          </script>
+        </body>
+      </html>
+    `;
+
+    const popup = window.open("", "_blank", "width=360,height=640");
+    if (!popup) {
+      setScanMessage("Habilita ventanas emergentes para imprimir.");
+      return;
+    }
+    popup.document.write(html);
+    popup.document.close();
+  };
+
   useEffect(() => {
     return () => {
       stopScanning();
@@ -492,6 +583,13 @@ export function AlmacenScannerDemo() {
                             }
                           >
                             {isOpen ? "Ocultar" : "Detalle"}
+                          </button>
+                          <button
+                            type="button"
+                            className="mini-btn"
+                            onClick={() => printTicket(movement)}
+                          >
+                            Imprimir
                           </button>
                         </div>
                       </div>

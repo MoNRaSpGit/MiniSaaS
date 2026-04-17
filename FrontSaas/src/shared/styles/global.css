@@ -526,6 +526,9 @@ a {
 
 .movement-right {
   text-align: right;
+  display: grid;
+  gap: 0.28rem;
+  justify-items: end;
 }
 
 .movement-positive {
