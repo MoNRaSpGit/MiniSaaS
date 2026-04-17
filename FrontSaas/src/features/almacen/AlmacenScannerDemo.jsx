@@ -479,14 +479,13 @@ export function AlmacenScannerDemo() {
 
     const rawText = buildPlainTicket(movement);
     const encodedText = encodeURIComponent(rawText);
-
-    const intentUrl = `intent://print/#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;S.text=${encodedText};end`;
-    const fallbackUrl = `rawbt://print?text=${encodedText}`;
+    const directUrl = `rawbt://print?text=${encodedText}`;
+    const fallbackUrl = `intent://print/#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;S.text=${encodedText};end`;
 
     setScanMessage("Enviando ticket a RawBT...");
 
     try {
-      window.location.href = intentUrl;
+      window.location.href = directUrl;
       setTimeout(() => {
         window.location.href = fallbackUrl;
       }, 700);
