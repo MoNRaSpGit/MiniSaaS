@@ -1,0 +1,1 @@
+{"name":"SaaS","short_name":"SaaS","start_url":"/MiniSaaS/#/","display":"standalone","background_color":"#0c0f18","lang":"en","scope":"/MiniSaaS/","description":"Scanner y gestion de ventas SaaS","theme_color":"#0c0f18","orientation":"portrait","icons":[{"src":"/MiniSaaS/icons/saas-icon.svg","sizes":"512x512","type":"image/svg+xml","purpose":"any maskable"}]}
