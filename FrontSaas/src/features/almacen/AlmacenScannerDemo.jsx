@@ -50,6 +50,9 @@ const UX_THEMES = [
 ];
 const TICKET_WIDTH = 32;
 const TICKET_FEED_LINES = 8;
+const ESC = "\x1B";
+const BOLD_ON = `${ESC}E\x01`;
+const BOLD_OFF = `${ESC}E\x00`;
 const DEMO_MOVEMENTS = [
   {
     id: 900001,
@@ -131,12 +134,12 @@ function moneyShort(value) {
 
 function buildPlainTicket(movement) {
   const lines = [
-    centerText("SCANER"),
-    centerText("Ticket de venta"),
+    `${BOLD_ON}${centerText("SCANER")}${BOLD_OFF}`,
+    `${BOLD_ON}${centerText("Ticket de venta")}${BOLD_OFF}`,
     lineSeparator(),
     `Fecha: ${movement.at}`,
     lineSeparator(),
-    "Producto               Total"
+    `${BOLD_ON}Producto               Total${BOLD_OFF}`
   ];
 
   movement.products.forEach((product) => {
@@ -146,9 +149,11 @@ function buildPlainTicket(movement) {
   });
 
   lines.push(lineSeparator());
-  lines.push(`${"TOTAL".padEnd(21, " ")}${moneyShort(movement.amount).padStart(11, " ")}`);
+  lines.push(
+    `${BOLD_ON}${"TOTAL".padEnd(21, " ")}${moneyShort(movement.amount).padStart(11, " ")}${BOLD_OFF}`
+  );
   lines.push(lineSeparator());
-  lines.push(centerText("Gracias por su compra"));
+  lines.push(`${BOLD_ON}${centerText("Gracias por su compra")}${BOLD_OFF}`);
   for (let i = 0; i < TICKET_FEED_LINES; i += 1) {
     lines.push("");
   }
@@ -421,11 +426,11 @@ export function AlmacenScannerDemo() {
 
     const rawText = buildPlainTicket(movement);
     const encodedText = encodeURIComponent(rawText);
-    const directUrl = `rawbt://print?text=${encodedText}`;
-    const fallbackUrl = `intent://print/#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;S.text=${encodedText};end`;
+    const intentUrl = `intent://print/#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;S.text=${encodedText};end`;
+    const fallbackUrl = `rawbt://print?text=${encodedText}`;
     setScanMessage("Enviando ticket a RawBT...");
     try {
-      window.location.href = directUrl;
+      window.location.href = intentUrl;
       setTimeout(() => {
         window.location.href = fallbackUrl;
       }, 700);
