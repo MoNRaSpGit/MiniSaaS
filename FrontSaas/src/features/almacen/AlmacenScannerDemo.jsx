@@ -335,7 +335,7 @@ export function AlmacenScannerDemo() {
   return (
     <section className={`scanner-shell theme-${currentTheme.id}`}>
       <div className="scanner-header scanner-header-main">
-        <h2>Caja Almacen</h2>
+        <h2>Scaner</h2>
         <button type="button" className="ux-switch-btn" onClick={rotateTheme}>
           {currentTheme.label}
         </button>
