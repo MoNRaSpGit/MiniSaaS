@@ -557,6 +557,12 @@ a {
   font-size: 0.84rem;
 }
 
+.movement-actions {
+  margin-top: 0.6rem;
+  display: flex;
+  gap: 0.45rem;
+}
+
 .theme-classic {
   --ux-shell-bg: rgba(255, 255, 255, 0.95);
   --ux-panel-bg: #ffffff;

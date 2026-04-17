@@ -104,6 +104,7 @@ export function AlmacenScannerDemo() {
   const [openMovementId, setOpenMovementId] = useState(null);
   const [activeView, setActiveView] = useState("scanner");
   const [themeIndex, setThemeIndex] = useState(0);
+  const [visibleMovements, setVisibleMovements] = useState(3);
 
   const isSupported = useMemo(() => {
     return typeof window !== "undefined" && "BarcodeDetector" in window;
@@ -310,7 +311,7 @@ export function AlmacenScannerDemo() {
     };
 
     setMovements((prev) => [movement, ...prev]);
-    setOpenMovementId(movement.id);
+    setOpenMovementId(null);
     setCart([]);
     setLastCode("");
     setScanMessage(`Venta registrada por ${formatCurrency(amount)}.`);
@@ -318,6 +319,8 @@ export function AlmacenScannerDemo() {
 
   const totalIncome = movements.reduce((acc, movement) => acc + movement.amount, 0);
   const currentTheme = UX_THEMES[themeIndex];
+  const visibleMovementList = movements.slice(0, visibleMovements);
+  const hasMoreMovements = movements.length > visibleMovements;
 
   const rotateTheme = () => {
     setThemeIndex((prev) => (prev + 1) % UX_THEMES.length);
@@ -466,7 +469,7 @@ export function AlmacenScannerDemo() {
               <p className="history-empty">Aun no hay ventas registradas.</p>
             ) : (
               <ul className="movement-list">
-                {movements.map((movement) => {
+                {visibleMovementList.map((movement) => {
                   const isOpen = openMovementId === movement.id;
                   return (
                     <li key={movement.id}>
@@ -510,6 +513,29 @@ export function AlmacenScannerDemo() {
                 })}
               </ul>
             )}
+
+            {movements.length > 3 ? (
+              <div className="movement-actions">
+                {hasMoreMovements ? (
+                  <button
+                    type="button"
+                    className="mini-btn"
+                    onClick={() => setVisibleMovements((prev) => prev + 5)}
+                  >
+                    Ver +5
+                  </button>
+                ) : null}
+                {visibleMovements < movements.length ? (
+                  <button
+                    type="button"
+                    className="mini-btn"
+                    onClick={() => setVisibleMovements(movements.length)}
+                  >
+                    Ver todo
+                  </button>
+                ) : null}
+              </div>
+            ) : null}
           </div>
         </div>
       )}

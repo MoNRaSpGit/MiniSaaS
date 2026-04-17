@@ -20,10 +20,6 @@ export function ProjectPage() {
   if (project.slug === "almacen") {
     return (
       <section className="detail-card detail-card-mobile">
-        <img src={getPublicAssetUrl(project.image)} alt={project.name} />
-        <span>{project.category}</span>
-        <h1>{project.name}</h1>
-        <p>{project.description}</p>
         <AlmacenScannerDemo />
         <Link to="/" className="back-link">
           Volver al catalogo
