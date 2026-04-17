@@ -403,6 +403,112 @@ a {
   color: #ffe18a;
 }
 
+.checkout-btn {
+  width: 100%;
+  margin-top: 0.65rem;
+  border: 1px solid #2a8c58;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #1d9f61 0%, #27bc73 100%);
+  color: #f4fff9;
+  font-weight: 700;
+  padding: 0.6rem 0.75rem;
+}
+
+.checkout-btn:disabled {
+  opacity: 0.45;
+}
+
+.control-panel {
+  margin-top: 0.9rem;
+  display: grid;
+  gap: 0.8rem;
+}
+
+.income-card,
+.movements-panel {
+  border: 1px solid var(--stroke);
+  border-radius: 12px;
+  background: rgba(8, 13, 28, 0.66);
+  padding: 0.7rem;
+}
+
+.income-card strong {
+  display: block;
+  margin-top: 0.35rem;
+  color: #6df5a2;
+  font-size: 1.25rem;
+}
+
+.movement-list,
+.movement-detail-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.movement-list {
+  margin-top: 0.6rem;
+  display: grid;
+  gap: 0.5rem;
+}
+
+.movement-list > li {
+  border: 1px solid #2b365e;
+  border-radius: 9px;
+  background: #111a33;
+  padding: 0.5rem;
+}
+
+.movement-main {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.movement-main strong {
+  display: block;
+  color: #e9f0ff;
+  font-size: 0.9rem;
+}
+
+.movement-main span {
+  color: var(--muted);
+  font-size: 0.78rem;
+}
+
+.movement-right {
+  text-align: right;
+}
+
+.movement-positive {
+  color: #6df5a2 !important;
+  margin-bottom: 0.28rem;
+}
+
+.movement-detail-list {
+  margin-top: 0.45rem;
+  border-top: 1px dashed #405086;
+  padding-top: 0.45rem;
+  display: grid;
+  gap: 0.35rem;
+}
+
+.movement-detail-list li {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.6rem;
+}
+
+.movement-detail-list li span {
+  color: #dbe7ff;
+  font-size: 0.84rem;
+}
+
+.movement-detail-list li strong {
+  color: #f7d46d;
+  font-size: 0.84rem;
+}
+
 @media (min-width: 640px) {
   .top-bar {
     padding: 1.5rem 1rem 1rem;

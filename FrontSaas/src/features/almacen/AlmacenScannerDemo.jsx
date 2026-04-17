@@ -15,6 +15,13 @@ function getNowLabel() {
   return new Date().toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
 }
 
+function getNowDateTimeLabel() {
+  const now = new Date();
+  const date = now.toLocaleDateString("es-UY");
+  const time = now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+  return `${date} ${time}`;
+}
+
 const KNOWN_PRODUCTS = {
   "5455345": { name: "Galletitas Mix Crocante 170g", price: 1290 },
   "7791234567890": { name: "Yerba Serrana Suave 1kg", price: 2980 },
@@ -45,6 +52,13 @@ function formatCurrency(value) {
     currency: "UYU",
     maximumFractionDigits: 0
   }).format(value);
+}
+
+function formatIncomeAmount(value) {
+  const amount = new Intl.NumberFormat("es-UY", {
+    maximumFractionDigits: 0
+  }).format(value);
+  return `+$ ${amount}`;
 }
 
 function getDemoProductFromCode(code) {
@@ -79,6 +93,8 @@ export function AlmacenScannerDemo() {
   const [lastCode, setLastCode] = useState("");
   const [cart, setCart] = useState([]);
   const [manualCode, setManualCode] = useState("");
+  const [movements, setMovements] = useState([]);
+  const [openMovementId, setOpenMovementId] = useState(null);
 
   const isSupported = useMemo(() => {
     return typeof window !== "undefined" && "BarcodeDetector" in window;
@@ -263,6 +279,36 @@ export function AlmacenScannerDemo() {
     setScanMessage("Caja reiniciada. Listo para escanear.");
   };
 
+  const closeSale = () => {
+    if (cart.length === 0) {
+      return;
+    }
+
+    const amount = cart.reduce((acc, item) => acc + item.qty * item.price, 0);
+    const totalUnits = cart.reduce((acc, item) => acc + item.qty, 0);
+    const movement = {
+      id: Date.now(),
+      at: getNowDateTimeLabel(),
+      amount,
+      totalUnits,
+      products: cart.map((item) => ({
+        code: item.code,
+        name: item.name,
+        qty: item.qty,
+        unitPrice: item.price,
+        subtotal: item.qty * item.price
+      }))
+    };
+
+    setMovements((prev) => [movement, ...prev]);
+    setOpenMovementId(movement.id);
+    setCart([]);
+    setLastCode("");
+    setScanMessage(`Venta registrada por ${formatCurrency(amount)}.`);
+  };
+
+  const totalIncome = movements.reduce((acc, movement) => acc + movement.amount, 0);
+
   useEffect(() => {
     return () => {
       stopScanning();
@@ -364,6 +410,73 @@ export function AlmacenScannerDemo() {
           <p className="cart-total">
             Total: <strong>{formatCurrency(totalAmount)}</strong>
           </p>
+          <button
+            type="button"
+            className="checkout-btn"
+            onClick={closeSale}
+            disabled={cart.length === 0}
+          >
+            Registrar venta
+          </button>
+        </div>
+      </div>
+
+      <div className="control-panel">
+        <div className="income-card">
+          <p className="result-title">Total vendido</p>
+          <strong>{formatCurrency(totalIncome)}</strong>
+        </div>
+
+        <div className="movements-panel">
+          <p className="result-title">Movimientos</p>
+          {movements.length === 0 ? (
+            <p className="history-empty">Aun no hay ventas registradas.</p>
+          ) : (
+            <ul className="movement-list">
+              {movements.map((movement) => {
+                const isOpen = openMovementId === movement.id;
+                return (
+                  <li key={movement.id}>
+                    <div className="movement-main">
+                      <div>
+                        <strong>{movement.at}</strong>
+                        <span>{movement.totalUnits} productos vendidos</span>
+                      </div>
+                      <div className="movement-right">
+                        <strong className="movement-positive">
+                          {formatIncomeAmount(movement.amount)}
+                        </strong>
+                        <button
+                          type="button"
+                          className="mini-btn"
+                          onClick={() =>
+                            setOpenMovementId((prev) =>
+                              prev === movement.id ? null : movement.id
+                            )
+                          }
+                        >
+                          {isOpen ? "Ocultar" : "Detalle"}
+                        </button>
+                      </div>
+                    </div>
+
+                    {isOpen ? (
+                      <ul className="movement-detail-list">
+                        {movement.products.map((product) => (
+                          <li key={`${movement.id}-${product.code}`}>
+                            <span>
+                              {product.qty}x {product.name}
+                            </span>
+                            <strong>{formatCurrency(product.subtotal)}</strong>
+                          </li>
+                        ))}
+                      </ul>
+                    ) : null}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
         </div>
       </div>
     </section>
