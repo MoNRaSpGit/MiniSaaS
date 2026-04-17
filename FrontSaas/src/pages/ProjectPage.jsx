@@ -1,5 +1,5 @@
 import { Link, useParams } from "react-router-dom";
-import { getProjectBySlug } from "../shared/data/projects";
+import { getProjectBySlug, getPublicAssetUrl } from "../shared/data/projects";
 import { AlmacenScannerDemo } from "../features/almacen/AlmacenScannerDemo";
 
 export function ProjectPage() {
@@ -20,7 +20,7 @@ export function ProjectPage() {
   if (project.slug === "almacen") {
     return (
       <section className="detail-card detail-card-mobile">
-        <img src={project.image} alt={project.name} />
+        <img src={getPublicAssetUrl(project.image)} alt={project.name} />
         <span>{project.category}</span>
         <h1>{project.name}</h1>
         <p>{project.description}</p>
@@ -34,7 +34,7 @@ export function ProjectPage() {
 
   return (
     <section className="detail-card detail-card-mobile">
-      <img src={project.image} alt={project.name} />
+      <img src={getPublicAssetUrl(project.image)} alt={project.name} />
       <span>{project.category}</span>
       <h1>{project.name}</h1>
       <p>{project.description}</p>

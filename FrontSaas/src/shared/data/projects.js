@@ -3,7 +3,7 @@ export const projects = [
     slug: "almacen",
     name: "Almacen",
     category: "Retail + Scanner",
-    image: "/images/almacen.svg",
+    image: "images/almacen.svg",
     description:
       "Control de stock, scanner de productos, ventas y reposicion inteligente."
   },
@@ -11,7 +11,7 @@ export const projects = [
     slug: "peluqueria",
     name: "Peluqueria",
     category: "Reservas",
-    image: "/images/peluqueria.svg",
+    image: "images/peluqueria.svg",
     description:
       "Agenda de turnos, reservas online, recordatorios y gestion de clientes."
   },
@@ -19,7 +19,7 @@ export const projects = [
     slug: "gimnasio",
     name: "Gimnasio",
     category: "Suscripciones",
-    image: "/images/gimnasio.svg",
+    image: "images/gimnasio.svg",
     description:
       "Planes mensuales, control de asistencia, pagos y seguimiento de alumnos."
   },
@@ -27,7 +27,7 @@ export const projects = [
     slug: "restaurante",
     name: "Restaurante",
     category: "Pedidos",
-    image: "/images/restaurante.svg",
+    image: "images/restaurante.svg",
     description:
       "Pedidos en mesa, cocina en tiempo real y control total de caja y delivery."
   },
@@ -35,7 +35,7 @@ export const projects = [
     slug: "clinica",
     name: "Clinica",
     category: "Turnos + Historial",
-    image: "/images/clinica.svg",
+    image: "images/clinica.svg",
     description:
       "Turnos medicos, historias clinicas y panel administrativo para secretarias."
   },
@@ -43,7 +43,7 @@ export const projects = [
     slug: "inmobiliaria",
     name: "Inmobiliaria",
     category: "Leads + CRM",
-    image: "/images/inmobiliaria.svg",
+    image: "images/inmobiliaria.svg",
     description:
       "Propiedades, seguimiento de leads, visitas y embudo comercial."
   }
@@ -51,4 +51,8 @@ export const projects = [
 
 export function getProjectBySlug(slug) {
   return projects.find((project) => project.slug === slug);
+}
+
+export function getPublicAssetUrl(path) {
+  return `${import.meta.env.BASE_URL}${path}`;
 }

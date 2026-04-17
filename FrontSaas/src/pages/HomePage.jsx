@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { projects } from "../shared/data/projects";
+import { getPublicAssetUrl, projects } from "../shared/data/projects";
 
 export function HomePage() {
   return (
@@ -19,7 +19,7 @@ export function HomePage() {
             className="project-card"
             key={project.slug}
           >
-            <img src={project.image} alt={project.name} />
+            <img src={getPublicAssetUrl(project.image)} alt={project.name} />
             <div className="project-content">
               <span>{project.category}</span>
               <h2>{project.name}</h2>
