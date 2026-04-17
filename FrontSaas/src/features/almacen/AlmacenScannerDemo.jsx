@@ -68,6 +68,7 @@ export function AlmacenScannerDemo() {
   const videoRef = useRef(null);
   const streamRef = useRef(null);
   const detectorRef = useRef(null);
+  const audioContextRef = useRef(null);
   const rafIdRef = useRef(null);
   const lastValueRef = useRef("");
   const lastReadAtRef = useRef(0);
@@ -111,7 +112,39 @@ export function AlmacenScannerDemo() {
     }
   };
 
-  const stopScanning = () => {
+  const playBeep = () => {
+    if (typeof window === "undefined") {
+      return;
+    }
+
+    if (!audioContextRef.current) {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!AudioContextClass) {
+        return;
+      }
+      audioContextRef.current = new AudioContextClass();
+    }
+
+    const ctx = audioContextRef.current;
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    oscillator.type = "sine";
+    oscillator.frequency.value = 1080;
+    gain.gain.value = 0.001;
+
+    oscillator.connect(gain);
+    gain.connect(ctx.destination);
+
+    const now = ctx.currentTime;
+    gain.gain.exponentialRampToValueAtTime(0.18, now + 0.01);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+
+    oscillator.start(now);
+    oscillator.stop(now + 0.13);
+  };
+
+  const stopScanning = (message = "Scanner detenido.") => {
     stopScanLoop();
 
     if (streamRef.current) {
@@ -124,7 +157,7 @@ export function AlmacenScannerDemo() {
     }
 
     setIsScanning(false);
-    setScanMessage("Scanner detenido.");
+    setScanMessage(message);
   };
 
   const scanFrame = async () => {
@@ -145,10 +178,14 @@ export function AlmacenScannerDemo() {
           lastValueRef.current = rawValue;
           lastReadAtRef.current = now;
           registerCode(rawValue, "camera");
+          playBeep();
 
           if ("vibrate" in navigator) {
             navigator.vibrate(80);
           }
+
+          stopScanning("Producto agregado. Toca 'Escanear 1 producto' para seguir.");
+          return;
         }
       }
     } catch (_error) {
@@ -169,6 +206,10 @@ export function AlmacenScannerDemo() {
     }
 
     try {
+      if (audioContextRef.current?.state === "suspended") {
+        await audioContextRef.current.resume();
+      }
+
       const stream = await navigator.mediaDevices.getUserMedia({
         video: {
           facingMode: { ideal: "environment" },
@@ -194,7 +235,7 @@ export function AlmacenScannerDemo() {
       }
 
       setIsScanning(true);
-      setScanMessage("Escaneando... apunta al codigo de barras.");
+      setScanMessage("Escaneando 1 producto... apunta al codigo de barras.");
       scanFrame();
     } catch (error) {
       setCameraError("No se pudo abrir la camara. Revisa permisos del navegador.");
@@ -249,15 +290,23 @@ export function AlmacenScannerDemo() {
       {cameraError ? <p className="scanner-error">{cameraError}</p> : null}
 
       <div className="scanner-actions">
-        {!isScanning ? (
-          <button type="button" onClick={startScanning} className="primary-btn">
-            Iniciar scanner
+        <button
+          type="button"
+          onClick={startScanning}
+          className="primary-btn"
+          disabled={isScanning}
+        >
+          {isScanning ? "Escaneando..." : "Escanear 1 producto"}
+        </button>
+        {isScanning ? (
+          <button
+            type="button"
+            onClick={() => stopScanning("Escaneo cancelado.")}
+            className="ghost-btn"
+          >
+            Cancelar
           </button>
-        ) : (
-          <button type="button" onClick={stopScanning} className="ghost-btn">
-            Detener scanner
-          </button>
-        )}
+        ) : null}
       </div>
 
       <form className="manual-form" onSubmit={handleManualSubmit}>
