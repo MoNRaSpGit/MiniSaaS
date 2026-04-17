@@ -48,6 +48,7 @@ const UX_THEMES = [
   { id: "sunset", label: "UX Sunset" },
   { id: "mint", label: "UX Mint" }
 ];
+const TICKET_WIDTH = 32;
 
 function hashCode(value) {
   return value.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -75,6 +76,59 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
+}
+
+function fitText(value, max) {
+  if (value.length <= max) {
+    return value;
+  }
+  return `${value.slice(0, Math.max(0, max - 1))}…`;
+}
+
+function centerText(value, width = TICKET_WIDTH) {
+  const trimmed = fitText(value, width);
+  const totalPadding = Math.max(0, width - trimmed.length);
+  const left = Math.floor(totalPadding / 2);
+  const right = totalPadding - left;
+  return `${" ".repeat(left)}${trimmed}${" ".repeat(right)}`;
+}
+
+function lineSeparator(width = TICKET_WIDTH) {
+  return "-".repeat(width);
+}
+
+function moneyShort(value) {
+  const formatted = new Intl.NumberFormat("es-UY", {
+    maximumFractionDigits: 0
+  }).format(value);
+  return `$${formatted}`;
+}
+
+function buildPlainTicket(movement) {
+  const lines = [
+    centerText("SCANER"),
+    centerText("Ticket de venta"),
+    lineSeparator(),
+    `Fecha: ${movement.at}`,
+    lineSeparator(),
+    "Producto               Total"
+  ];
+
+  movement.products.forEach((product) => {
+    const left = fitText(`${product.qty}x ${product.name}`, 21).padEnd(21, " ");
+    const right = moneyShort(product.subtotal).padStart(11, " ");
+    lines.push(`${left}${right}`);
+  });
+
+  lines.push(lineSeparator());
+  lines.push(`${"TOTAL".padEnd(21, " ")}${moneyShort(movement.amount).padStart(11, " ")}`);
+  lines.push(lineSeparator());
+  lines.push(centerText("Gracias por su compra"));
+  lines.push("");
+  lines.push("");
+  lines.push("");
+
+  return lines.join("\n");
 }
 
 function getDemoProductFromCode(code) {
@@ -417,6 +471,29 @@ export function AlmacenScannerDemo() {
     popup.document.close();
   };
 
+  const printTicketRawBt = (movement) => {
+    if (!movement || typeof window === "undefined") {
+      return;
+    }
+
+    const rawText = buildPlainTicket(movement);
+    const encodedText = encodeURIComponent(rawText);
+
+    const intentUrl = `intent://print/#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;S.text=${encodedText};end`;
+    const fallbackUrl = `rawbt://print?text=${encodedText}`;
+
+    setScanMessage("Enviando ticket a RawBT...");
+
+    try {
+      window.location.href = intentUrl;
+      setTimeout(() => {
+        window.location.href = fallbackUrl;
+      }, 700);
+    } catch (_error) {
+      window.location.href = fallbackUrl;
+    }
+  };
+
   useEffect(() => {
     return () => {
       stopScanning();
@@ -590,6 +667,13 @@ export function AlmacenScannerDemo() {
                             onClick={() => printTicket(movement)}
                           >
                             Imprimir
+                          </button>
+                          <button
+                            type="button"
+                            className="mini-btn"
+                            onClick={() => printTicketRawBt(movement)}
+                          >
+                            RawBT (Red)
                           </button>
                         </div>
                       </div>
