@@ -44,4 +44,26 @@ Backend por defecto en `http://localhost:3001`.
 2. Crear el modulo real de cada demo (almacen, peluqueria, etc).
 3. Agregar autenticacion simple para modo admin/comercial.
 
-# MiniSaaS
+## Deploy en Render
+
+Crear 2 servicios desde el mismo repo:
+
+### 1) Frontend (`FrontSaas`)
+- Service type: `Static Site`
+- Root directory: `FrontSaas`
+- Build command: `npm install && npm run build`
+- Publish directory: `dist`
+- Environment variables:
+  - `VITE_API_URL=https://TU-BACKEND.onrender.com`
+
+### 2) Backend (`BackSaas`)
+- Service type: `Web Service`
+- Root directory: `BackSaas`
+- Build command: `npm install`
+- Start command: `npm run start`
+- Environment variables:
+  - `NODE_ENV=production`
+  - `DB_PATH=./data/minisaas.db`
+  - `CORS_ORIGIN=https://TU-FRONTEND.onrender.com`
+
+`PORT` lo inyecta Render automaticamente.

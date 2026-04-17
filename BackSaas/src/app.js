@@ -1,10 +1,15 @@
 import express from "express";
 import cors from "cors";
 import { projectsRouter } from "./routes/projects.routes.js";
+import { env } from "./config/env.js";
 
 export const app = express();
 
-app.use(cors());
+app.use(
+  cors({
+    origin: env.corsOrigin === "*" ? true : env.corsOrigin
+  })
+);
 app.use(express.json());
 
 app.get("/api/health", (_req, res) => {
