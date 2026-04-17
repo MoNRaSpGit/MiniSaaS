@@ -393,6 +393,7 @@ export function AlmacenScannerDemo() {
     if (!movement || typeof window === "undefined") {
       return;
     }
+    setScanMessage("Abriendo impresion del sistema...");
 
     const rows = movement.products
       .map(
@@ -664,16 +665,16 @@ export function AlmacenScannerDemo() {
                           <button
                             type="button"
                             className="mini-btn"
-                            onClick={() => printTicket(movement)}
+                            onClick={() => printTicketRawBt(movement)}
                           >
-                            Imprimir
+                            Imprimir OTG (RawBT)
                           </button>
                           <button
                             type="button"
                             className="mini-btn"
-                            onClick={() => printTicketRawBt(movement)}
+                            onClick={() => printTicket(movement)}
                           >
-                            RawBT (Red)
+                            Imprimir Sistema
                           </button>
                         </div>
                       </div>
