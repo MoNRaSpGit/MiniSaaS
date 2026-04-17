@@ -1,4 +1,8 @@
 import { useEffect, useMemo, useRef, useState } from "react";
+import { FacialView } from "./components/FacialView";
+import { DEMO_MOVEMENTS } from "./data/demoMovements";
+import { getDemoProductFromCode } from "./data/catalog";
+import { buildPlainTicket } from "./lib/ticketBuilder";
 
 const SCAN_FORMATS = [
   "ean_13",
@@ -22,74 +26,12 @@ function getNowDateTimeLabel() {
   return `${date} ${time}`;
 }
 
-const KNOWN_PRODUCTS = {
-  "5455345": { name: "Galletitas Mix Crocante 170g", price: 1290 },
-  "7791234567890": { name: "Yerba Serrana Suave 1kg", price: 2980 },
-  "7501031311309": { name: "Jabon Liquido Fresh 500ml", price: 1840 }
-};
-
-const BRANDS = ["Norte", "Del Valle", "Maxi", "Urbano", "Don", "Prime", "Eco"];
-const ITEMS = [
-  "Arroz Integral 1kg",
-  "Pasta Fusilli 500g",
-  "Leche Entera 1L",
-  "Atun en Agua 170g",
-  "Cafe Molido 250g",
-  "Jugo Naranja 1L",
-  "Pan Lactal Blanco",
-  "Detergente Limon 750ml",
-  "Papel Higienico x4",
-  "Gaseosa Cola 2.25L"
-];
-
 const UX_THEMES = [
   { id: "default", label: "UX Default" },
   { id: "classic", label: "UX Clasica" },
   { id: "sunset", label: "UX Sunset" },
   { id: "mint", label: "UX Mint" }
 ];
-const TICKET_WIDTH = 32;
-const TICKET_FEED_LINES = 8;
-const ESC = "\x1B";
-const BOLD_ON = `${ESC}E\x01`;
-const BOLD_OFF = `${ESC}E\x00`;
-const DEMO_MOVEMENTS = [
-  {
-    id: 900001,
-    at: "17/04/2026 09:12",
-    amount: 5870,
-    totalUnits: 4,
-    products: [
-      { code: "5455345", name: "Galletitas Mix Crocante 170g", qty: 2, subtotal: 2580 },
-      { code: "7501031311309", name: "Jabon Liquido Fresh 500ml", qty: 1, subtotal: 1840 },
-      { code: "7791234567890", name: "Yerba Serrana Suave 1kg", qty: 1, subtotal: 1450 }
-    ]
-  },
-  {
-    id: 900002,
-    at: "17/04/2026 11:47",
-    amount: 4230,
-    totalUnits: 3,
-    products: [
-      { code: "7791234567890", name: "Yerba Serrana Suave 1kg", qty: 1, subtotal: 2980 },
-      { code: "5455345", name: "Galletitas Mix Crocante 170g", qty: 1, subtotal: 1250 }
-    ]
-  },
-  {
-    id: 900003,
-    at: "17/04/2026 14:05",
-    amount: 3190,
-    totalUnits: 2,
-    products: [
-      { code: "7501031311309", name: "Jabon Liquido Fresh 500ml", qty: 1, subtotal: 1840 },
-      { code: "5455345", name: "Galletitas Mix Crocante 170g", qty: 1, subtotal: 1350 }
-    ]
-  }
-];
-
-function hashCode(value) {
-  return value.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
-}
 
 function formatCurrency(value) {
   return new Intl.NumberFormat("es-UY", {
@@ -104,78 +46,6 @@ function formatIncomeAmount(value) {
     maximumFractionDigits: 0
   }).format(value);
   return `+$ ${amount}`;
-}
-
-function fitText(value, max) {
-  if (value.length <= max) {
-    return value;
-  }
-  return `${value.slice(0, Math.max(0, max - 1))}...`;
-}
-
-function centerText(value, width = TICKET_WIDTH) {
-  const trimmed = fitText(value, width);
-  const totalPadding = Math.max(0, width - trimmed.length);
-  const left = Math.floor(totalPadding / 2);
-  const right = totalPadding - left;
-  return `${" ".repeat(left)}${trimmed}${" ".repeat(right)}`;
-}
-
-function lineSeparator(width = TICKET_WIDTH) {
-  return "-".repeat(width);
-}
-
-function moneyShort(value) {
-  const formatted = new Intl.NumberFormat("es-UY", {
-    maximumFractionDigits: 0
-  }).format(value);
-  return `$${formatted}`;
-}
-
-function buildPlainTicket(movement) {
-  const lines = [
-    `${BOLD_ON}${centerText("SCANER")}${BOLD_OFF}`,
-    `${BOLD_ON}${centerText("Ticket de venta")}${BOLD_OFF}`,
-    lineSeparator(),
-    `Fecha: ${movement.at}`,
-    lineSeparator(),
-    `${BOLD_ON}Producto               Total${BOLD_OFF}`
-  ];
-
-  movement.products.forEach((product) => {
-    const left = fitText(`${product.qty}x ${product.name}`, 21).padEnd(21, " ");
-    const right = moneyShort(product.subtotal).padStart(11, " ");
-    lines.push(`${left}${right}`);
-  });
-
-  lines.push(lineSeparator());
-  lines.push(
-    `${BOLD_ON}${"TOTAL".padEnd(21, " ")}${moneyShort(movement.amount).padStart(11, " ")}${BOLD_OFF}`
-  );
-  lines.push(lineSeparator());
-  lines.push(`${BOLD_ON}${centerText("Gracias por su compra")}${BOLD_OFF}`);
-  for (let i = 0; i < TICKET_FEED_LINES; i += 1) {
-    lines.push("");
-  }
-
-  return lines.join("\n");
-}
-
-function getDemoProductFromCode(code) {
-  if (KNOWN_PRODUCTS[code]) {
-    return { ...KNOWN_PRODUCTS[code], code };
-  }
-
-  const hash = hashCode(code);
-  const brand = BRANDS[hash % BRANDS.length];
-  const item = ITEMS[hash % ITEMS.length];
-  const price = 990 + ((hash % 26) + 1) * 120;
-
-  return {
-    code,
-    name: `${brand} ${item}`,
-    price
-  };
 }
 
 export function AlmacenScannerDemo() {
@@ -465,6 +335,13 @@ export function AlmacenScannerDemo() {
         >
           Movimientos
         </button>
+        <button
+          type="button"
+          className={`almacen-link ${activeView === "facial" ? "active" : ""}`}
+          onClick={() => setActiveView("facial")}
+        >
+          Facial
+        </button>
       </div>
 
       {activeView === "scanner" ? (
@@ -565,7 +442,7 @@ export function AlmacenScannerDemo() {
             </div>
           </div>
         </>
-      ) : (
+      ) : activeView === "movements" ? (
         <div className="control-panel">
           <div className="income-card">
             <p className="result-title">Total vendido</p>
@@ -654,6 +531,8 @@ export function AlmacenScannerDemo() {
             ) : null}
           </div>
         </div>
+      ) : (
+        <FacialView />
       )}
     </section>
   );

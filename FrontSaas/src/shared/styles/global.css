@@ -566,6 +566,64 @@ a {
   gap: 0.45rem;
 }
 
+.facial-shell {
+  margin-top: 0.9rem;
+  border: 1px solid var(--ux-border);
+  border-radius: 12px;
+  background: var(--ux-panel-bg);
+  padding: 0.75rem;
+}
+
+.facial-header h3 {
+  margin: 0;
+}
+
+.facial-header p {
+  margin: 0.45rem 0 0;
+  color: var(--ux-muted-text);
+}
+
+.facial-camera {
+  margin-top: 0.75rem;
+  border: 1px solid var(--ux-border);
+  border-radius: 12px;
+  overflow: hidden;
+  background: #0b111c;
+}
+
+.facial-camera video {
+  width: 100%;
+  min-height: 220px;
+  max-height: 360px;
+  object-fit: cover;
+  display: block;
+}
+
+.facial-controls {
+  margin-top: 0.7rem;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.facial-controls input {
+  border: 1px solid var(--ux-border);
+  border-radius: 10px;
+  background: #0c1223;
+  color: #f2f6ff;
+  padding: 0.65rem 0.7rem;
+}
+
+.facial-greeting {
+  margin-top: 0.7rem;
+  border: 1px solid var(--ux-border);
+  border-radius: 10px;
+  background: #1f3b31;
+  color: #c9ffe6;
+  font-weight: 700;
+  text-align: center;
+  padding: 0.6rem;
+}
+
 .theme-classic {
   --ux-shell-bg: rgba(255, 255, 255, 0.95);
   --ux-panel-bg: #ffffff;
