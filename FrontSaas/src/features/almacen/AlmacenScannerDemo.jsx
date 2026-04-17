@@ -49,6 +49,7 @@ const UX_THEMES = [
   { id: "mint", label: "UX Mint" }
 ];
 const TICKET_WIDTH = 32;
+const TICKET_FEED_LINES = 8;
 
 function hashCode(value) {
   return value.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -115,9 +116,9 @@ function buildPlainTicket(movement) {
   lines.push(`${"TOTAL".padEnd(21, " ")}${moneyShort(movement.amount).padStart(11, " ")}`);
   lines.push(lineSeparator());
   lines.push(centerText("Gracias por su compra"));
-  lines.push("");
-  lines.push("");
-  lines.push("");
+  for (let i = 0; i < TICKET_FEED_LINES; i += 1) {
+    lines.push("");
+  }
 
   return lines.join("\n");
 }
