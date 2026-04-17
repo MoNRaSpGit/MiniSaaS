@@ -426,16 +426,12 @@ export function AlmacenScannerDemo() {
 
     const rawText = buildPlainTicket(movement);
     const encodedText = encodeURIComponent(rawText);
-    const intentUrl = `intent://print/#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;S.text=${encodedText};end`;
-    const fallbackUrl = `rawbt://print?text=${encodedText}`;
+    const rawbtUrl = `rawbt://print?text=${encodedText}`;
     setScanMessage("Enviando ticket a RawBT...");
     try {
-      window.location.href = intentUrl;
-      setTimeout(() => {
-        window.location.href = fallbackUrl;
-      }, 700);
+      window.location.href = rawbtUrl;
     } catch (_error) {
-      window.location.href = fallbackUrl;
+      setScanMessage("No se pudo abrir RawBT.");
     }
   };
 
