@@ -67,3 +67,19 @@ Crear 2 servicios desde el mismo repo:
   - `CORS_ORIGIN=https://TU-FRONTEND.onrender.com`
 
 `PORT` lo inyecta Render automaticamente.
+
+## Deploy Front en GitHub Pages
+
+Desde `FrontSaas/`:
+
+```bash
+npm install
+npm run deploy
+```
+
+Despues en GitHub:
+- `Settings > Pages`
+- Source: `Deploy from a branch`
+- Branch: `gh-pages` / folder `/ (root)`
+
+Nota: el frontend ya esta preparado con base `/MiniSaaS/` y router hash para evitar 404 al recargar.
