@@ -482,7 +482,7 @@ export function AlmacenScannerDemo() {
     const directUrl = `rawbt://print?text=${encodedText}`;
     const fallbackUrl = `intent://print/#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;S.text=${encodedText};end`;
 
-    setScanMessage("Enviando ticket a RawBT...");
+    setScanMessage("Enviando ticket a RawBT por red...");
 
     try {
       window.location.href = directUrl;
@@ -666,7 +666,7 @@ export function AlmacenScannerDemo() {
                             className="mini-btn"
                             onClick={() => printTicketRawBt(movement)}
                           >
-                            Imprimir OTG (RawBT)
+                            Imprimir Red (RawBT)
                           </button>
                           <button
                             type="button"
