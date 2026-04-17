@@ -42,6 +42,13 @@ const ITEMS = [
   "Gaseosa Cola 2.25L"
 ];
 
+const UX_THEMES = [
+  { id: "default", label: "UX Default" },
+  { id: "classic", label: "UX Clasica" },
+  { id: "sunset", label: "UX Sunset" },
+  { id: "mint", label: "UX Mint" }
+];
+
 function hashCode(value) {
   return value.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
 }
@@ -95,6 +102,8 @@ export function AlmacenScannerDemo() {
   const [manualCode, setManualCode] = useState("");
   const [movements, setMovements] = useState([]);
   const [openMovementId, setOpenMovementId] = useState(null);
+  const [activeView, setActiveView] = useState("scanner");
+  const [themeIndex, setThemeIndex] = useState(0);
 
   const isSupported = useMemo(() => {
     return typeof window !== "undefined" && "BarcodeDetector" in window;
@@ -308,6 +317,11 @@ export function AlmacenScannerDemo() {
   };
 
   const totalIncome = movements.reduce((acc, movement) => acc + movement.amount, 0);
+  const currentTheme = UX_THEMES[themeIndex];
+
+  const rotateTheme = () => {
+    setThemeIndex((prev) => (prev + 1) % UX_THEMES.length);
+  };
 
   useEffect(() => {
     return () => {
@@ -316,169 +330,189 @@ export function AlmacenScannerDemo() {
   }, []);
 
   return (
-    <section className="scanner-shell">
-      <div className="scanner-header">
-        <h2>Demo Scanner - Almacen</h2>
-        <p>
-          Prueba rapida para validar lectura desde celular. Si detecta bien, seguimos
-          con el modulo completo.
-        </p>
+    <section className={`scanner-shell theme-${currentTheme.id}`}>
+      <div className="scanner-header scanner-header-main">
+        <h2>Caja Almacen</h2>
+        <button type="button" className="ux-switch-btn" onClick={rotateTheme}>
+          {currentTheme.label}
+        </button>
       </div>
 
-      <div className="scanner-viewport">
-        <video ref={videoRef} playsInline muted />
-        <div className="scanner-overlay">
-          <span>Apunta al codigo</span>
-        </div>
-      </div>
-
-      <p className="scanner-message">{scanMessage}</p>
-      {cameraError ? <p className="scanner-error">{cameraError}</p> : null}
-
-      <div className="scanner-actions">
+      <div className="almacen-links">
         <button
           type="button"
-          onClick={startScanning}
-          className="primary-btn"
-          disabled={isScanning}
+          className={`almacen-link ${activeView === "scanner" ? "active" : ""}`}
+          onClick={() => setActiveView("scanner")}
         >
-          {isScanning ? "Escaneando..." : "Escanear 1 producto"}
+          Scanner
         </button>
-        {isScanning ? (
-          <button
-            type="button"
-            onClick={() => stopScanning("Escaneo cancelado.")}
-            className="ghost-btn"
-          >
-            Cancelar
-          </button>
-        ) : null}
+        <button
+          type="button"
+          className={`almacen-link ${activeView === "movements" ? "active" : ""}`}
+          onClick={() => setActiveView("movements")}
+        >
+          Movimientos
+        </button>
       </div>
 
-      <form className="manual-form" onSubmit={handleManualSubmit}>
-        <label htmlFor="manualCode">Carga manual para test rapido</label>
-        <div>
-          <input
-            id="manualCode"
-            type="text"
-            value={manualCode}
-            onChange={(event) => setManualCode(event.target.value)}
-            placeholder="Ej: 7791234567890"
-          />
-          <button type="submit">Guardar</button>
-        </div>
-      </form>
+      {activeView === "scanner" ? (
+        <>
+          <div className="scanner-viewport">
+            <video ref={videoRef} playsInline muted />
+            <div className="scanner-overlay">
+              <span>Alinear codigo</span>
+            </div>
+          </div>
 
-      <div className="result-panel">
-        <p className="result-title">Ultimo codigo</p>
-        <strong>{lastCode || "Aun sin lecturas"}</strong>
-      </div>
+          <p className="scanner-message">{scanMessage}</p>
+          {cameraError ? <p className="scanner-error">{cameraError}</p> : null}
 
-      <div className="history-panel">
-        <div className="cart-headline">
-          <p className="result-title">Ticket de compra</p>
-          <button type="button" className="mini-btn" onClick={clearCart}>
-            Limpiar
-          </button>
-        </div>
+          <div className="scanner-actions">
+            <button
+              type="button"
+              onClick={startScanning}
+              className="primary-btn"
+              disabled={isScanning}
+            >
+              {isScanning ? "Escaneando..." : "Escanear 1 producto"}
+            </button>
+            {isScanning ? (
+              <button
+                type="button"
+                onClick={() => stopScanning("Escaneo cancelado.")}
+                className="ghost-btn"
+              >
+                Cancelar
+              </button>
+            ) : null}
+          </div>
 
-        {cart.length === 0 ? (
-          <p className="history-empty">Escanea productos para armar la compra.</p>
-        ) : (
-          <ul className="cart-list">
-            {cart.map((item) => (
-              <li key={item.code}>
-                <div>
-                  <strong>{item.name}</strong>
-                  <span>
-                    Cod: {item.code} - {item.source} - {item.at}
-                  </span>
-                </div>
-                <div className="cart-item-price">
-                  <small>x{item.qty}</small>
-                  <strong>{formatCurrency(item.qty * item.price)}</strong>
-                </div>
-              </li>
-            ))}
-          </ul>
-        )}
+          <form className="manual-form" onSubmit={handleManualSubmit}>
+            <label htmlFor="manualCode">Ingreso manual</label>
+            <div>
+              <input
+                id="manualCode"
+                type="text"
+                value={manualCode}
+                onChange={(event) => setManualCode(event.target.value)}
+                placeholder="Codigo"
+              />
+              <button type="submit">Agregar</button>
+            </div>
+          </form>
 
-        <div className="cart-summary">
-          <p>
-            Items: <strong>{totalItems}</strong>
-          </p>
-          <p className="cart-total">
-            Total: <strong>{formatCurrency(totalAmount)}</strong>
-          </p>
-          <button
-            type="button"
-            className="checkout-btn"
-            onClick={closeSale}
-            disabled={cart.length === 0}
-          >
-            Registrar venta
-          </button>
-        </div>
-      </div>
+          <div className="result-panel">
+            <p className="result-title">Ultimo codigo</p>
+            <strong>{lastCode || "Sin lectura"}</strong>
+          </div>
 
-      <div className="control-panel">
-        <div className="income-card">
-          <p className="result-title">Total vendido</p>
-          <strong>{formatCurrency(totalIncome)}</strong>
-        </div>
+          <div className="history-panel">
+            <div className="cart-headline">
+              <p className="result-title">Ticket actual</p>
+              <button type="button" className="mini-btn" onClick={clearCart}>
+                Limpiar
+              </button>
+            </div>
 
-        <div className="movements-panel">
-          <p className="result-title">Movimientos</p>
-          {movements.length === 0 ? (
-            <p className="history-empty">Aun no hay ventas registradas.</p>
-          ) : (
-            <ul className="movement-list">
-              {movements.map((movement) => {
-                const isOpen = openMovementId === movement.id;
-                return (
-                  <li key={movement.id}>
-                    <div className="movement-main">
-                      <div>
-                        <strong>{movement.at}</strong>
-                        <span>{movement.totalUnits} productos vendidos</span>
-                      </div>
-                      <div className="movement-right">
-                        <strong className="movement-positive">
-                          {formatIncomeAmount(movement.amount)}
-                        </strong>
-                        <button
-                          type="button"
-                          className="mini-btn"
-                          onClick={() =>
-                            setOpenMovementId((prev) =>
-                              prev === movement.id ? null : movement.id
-                            )
-                          }
-                        >
-                          {isOpen ? "Ocultar" : "Detalle"}
-                        </button>
-                      </div>
+            {cart.length === 0 ? (
+              <p className="history-empty">Sin productos cargados.</p>
+            ) : (
+              <ul className="cart-list">
+                {cart.map((item) => (
+                  <li key={item.code}>
+                    <div>
+                      <strong>{item.name}</strong>
+                      <span>
+                        Cod: {item.code} - {item.source} - {item.at}
+                      </span>
                     </div>
-
-                    {isOpen ? (
-                      <ul className="movement-detail-list">
-                        {movement.products.map((product) => (
-                          <li key={`${movement.id}-${product.code}`}>
-                            <span>
-                              {product.qty}x {product.name}
-                            </span>
-                            <strong>{formatCurrency(product.subtotal)}</strong>
-                          </li>
-                        ))}
-                      </ul>
-                    ) : null}
+                    <div className="cart-item-price">
+                      <small>x{item.qty}</small>
+                      <strong>{formatCurrency(item.qty * item.price)}</strong>
+                    </div>
                   </li>
-                );
-              })}
-            </ul>
-          )}
+                ))}
+              </ul>
+            )}
+
+            <div className="cart-summary">
+              <p>
+                Items: <strong>{totalItems}</strong>
+              </p>
+              <p className="cart-total">
+                Total: <strong>{formatCurrency(totalAmount)}</strong>
+              </p>
+              <button
+                type="button"
+                className="checkout-btn"
+                onClick={closeSale}
+                disabled={cart.length === 0}
+              >
+                Registrar venta
+              </button>
+            </div>
+          </div>
+        </>
+      ) : (
+        <div className="control-panel">
+          <div className="income-card">
+            <p className="result-title">Total vendido</p>
+            <strong>{formatCurrency(totalIncome)}</strong>
+          </div>
+
+          <div className="movements-panel">
+            <p className="result-title">Movimientos</p>
+            {movements.length === 0 ? (
+              <p className="history-empty">Aun no hay ventas registradas.</p>
+            ) : (
+              <ul className="movement-list">
+                {movements.map((movement) => {
+                  const isOpen = openMovementId === movement.id;
+                  return (
+                    <li key={movement.id}>
+                      <div className="movement-main">
+                        <div>
+                          <strong>{movement.at}</strong>
+                          <span>{movement.totalUnits} productos vendidos</span>
+                        </div>
+                        <div className="movement-right">
+                          <strong className="movement-positive">
+                            {formatIncomeAmount(movement.amount)}
+                          </strong>
+                          <button
+                            type="button"
+                            className="mini-btn"
+                            onClick={() =>
+                              setOpenMovementId((prev) =>
+                                prev === movement.id ? null : movement.id
+                              )
+                            }
+                          >
+                            {isOpen ? "Ocultar" : "Detalle"}
+                          </button>
+                        </div>
+                      </div>
+
+                      {isOpen ? (
+                        <ul className="movement-detail-list">
+                          {movement.products.map((product) => (
+                            <li key={`${movement.id}-${product.code}`}>
+                              <span>
+                                {product.qty}x {product.name}
+                              </span>
+                              <strong>{formatCurrency(product.subtotal)}</strong>
+                            </li>
+                          ))}
+                        </ul>
+                      ) : null}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </section>
   );
 }

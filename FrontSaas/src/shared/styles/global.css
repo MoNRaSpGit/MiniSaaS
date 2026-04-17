@@ -166,16 +166,64 @@ a {
 
 /* Almacen scanner */
 .scanner-shell {
+  --ux-shell-bg: rgba(7, 12, 25, 0.6);
+  --ux-panel-bg: rgba(8, 13, 28, 0.66);
+  --ux-border: var(--stroke);
+  --ux-surface: #111a33;
+  --ux-primary-text: #e9f0ff;
+  --ux-muted-text: var(--muted);
+  --ux-mini-btn-bg: #1a2751;
+  --ux-video-bg: #02040b;
+  --ux-line: #405086;
+  --ux-checkout-border: #2a8c58;
+  --ux-checkout-gradient: linear-gradient(90deg, #1d9f61 0%, #27bc73 100%);
+  --ux-positive: #6df5a2;
   margin-top: 1rem;
-  border: 1px solid var(--stroke);
+  border: 1px solid var(--ux-border);
   border-radius: 14px;
-  background: rgba(7, 12, 25, 0.6);
+  background: var(--ux-shell-bg);
   padding: 0.8rem;
 }
 
 .scanner-header h2 {
   margin: 0;
   font-size: 1.1rem;
+}
+
+.scanner-header-main {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.ux-switch-btn {
+  border: 1px solid var(--ux-border);
+  border-radius: 999px;
+  background: var(--ux-mini-btn-bg);
+  color: var(--ux-primary-text);
+  font-size: 0.78rem;
+  padding: 0.35rem 0.72rem;
+}
+
+.almacen-links {
+  display: flex;
+  gap: 0.45rem;
+  margin-top: 0.72rem;
+}
+
+.almacen-link {
+  border: 1px solid var(--ux-border);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ux-muted-text);
+  padding: 0.4rem 0.75rem;
+  font-size: 0.85rem;
+}
+
+.almacen-link.active {
+  background: var(--ux-mini-btn-bg);
+  color: var(--ux-primary-text);
 }
 
 .scanner-header p {
@@ -187,10 +235,10 @@ a {
 .scanner-viewport {
   position: relative;
   margin-top: 0.8rem;
-  border: 1px solid var(--stroke);
+  border: 1px solid var(--ux-border);
   border-radius: 12px;
   overflow: hidden;
-  background: #02040b;
+  background: var(--ux-video-bg);
 }
 
 .scanner-viewport video {
@@ -265,7 +313,7 @@ a {
 
 .manual-form label {
   display: block;
-  color: var(--muted);
+  color: var(--ux-muted-text);
   font-size: 0.88rem;
   margin-bottom: 0.4rem;
 }
@@ -278,7 +326,7 @@ a {
 .manual-form input {
   flex: 1;
   min-width: 0;
-  border: 1px solid var(--stroke);
+  border: 1px solid var(--ux-border);
   border-radius: 10px;
   background: #0c1223;
   color: #f2f6ff;
@@ -286,9 +334,9 @@ a {
 }
 
 .manual-form button {
-  border: 1px solid var(--stroke);
+  border: 1px solid var(--ux-border);
   border-radius: 10px;
-  background: #1b2b53;
+  background: var(--ux-mini-btn-bg);
   color: #f2f6ff;
   padding: 0.65rem 0.85rem;
 }
@@ -296,9 +344,9 @@ a {
 .result-panel,
 .history-panel {
   margin-top: 0.8rem;
-  border: 1px solid var(--stroke);
+  border: 1px solid var(--ux-border);
   border-radius: 12px;
-  background: rgba(8, 13, 28, 0.66);
+  background: var(--ux-panel-bg);
   padding: 0.7rem;
 }
 
@@ -338,18 +386,18 @@ a {
 }
 
 .mini-btn {
-  border: 1px solid var(--stroke);
+  border: 1px solid var(--ux-border);
   border-radius: 999px;
-  background: #1a2751;
+  background: var(--ux-mini-btn-bg);
   color: #e6eeff;
   font-size: 0.78rem;
   padding: 0.32rem 0.65rem;
 }
 
 .cart-list li {
-  border: 1px solid #2b365e;
+  border: 1px solid var(--ux-border);
   border-radius: 8px;
-  background: #111a33;
+  background: var(--ux-surface);
   padding: 0.45rem 0.55rem;
   display: flex;
   align-items: flex-start;
@@ -380,7 +428,7 @@ a {
 
 .cart-summary {
   margin-top: 0.7rem;
-  border-top: 1px dashed #405086;
+  border-top: 1px dashed var(--ux-line);
   padding-top: 0.55rem;
 }
 
@@ -406,9 +454,9 @@ a {
 .checkout-btn {
   width: 100%;
   margin-top: 0.65rem;
-  border: 1px solid #2a8c58;
+  border: 1px solid var(--ux-checkout-border);
   border-radius: 10px;
-  background: linear-gradient(90deg, #1d9f61 0%, #27bc73 100%);
+  background: var(--ux-checkout-gradient);
   color: #f4fff9;
   font-weight: 700;
   padding: 0.6rem 0.75rem;
@@ -426,16 +474,16 @@ a {
 
 .income-card,
 .movements-panel {
-  border: 1px solid var(--stroke);
+  border: 1px solid var(--ux-border);
   border-radius: 12px;
-  background: rgba(8, 13, 28, 0.66);
+  background: var(--ux-panel-bg);
   padding: 0.7rem;
 }
 
 .income-card strong {
   display: block;
   margin-top: 0.35rem;
-  color: #6df5a2;
+  color: var(--ux-positive);
   font-size: 1.25rem;
 }
 
@@ -453,9 +501,9 @@ a {
 }
 
 .movement-list > li {
-  border: 1px solid #2b365e;
+  border: 1px solid var(--ux-border);
   border-radius: 9px;
-  background: #111a33;
+  background: var(--ux-surface);
   padding: 0.5rem;
 }
 
@@ -467,12 +515,12 @@ a {
 
 .movement-main strong {
   display: block;
-  color: #e9f0ff;
+  color: var(--ux-primary-text);
   font-size: 0.9rem;
 }
 
 .movement-main span {
-  color: var(--muted);
+  color: var(--ux-muted-text);
   font-size: 0.78rem;
 }
 
@@ -481,13 +529,13 @@ a {
 }
 
 .movement-positive {
-  color: #6df5a2 !important;
+  color: var(--ux-positive) !important;
   margin-bottom: 0.28rem;
 }
 
 .movement-detail-list {
   margin-top: 0.45rem;
-  border-top: 1px dashed #405086;
+  border-top: 1px dashed var(--ux-line);
   padding-top: 0.45rem;
   display: grid;
   gap: 0.35rem;
@@ -500,13 +548,59 @@ a {
 }
 
 .movement-detail-list li span {
-  color: #dbe7ff;
+  color: var(--ux-primary-text);
   font-size: 0.84rem;
 }
 
 .movement-detail-list li strong {
   color: #f7d46d;
   font-size: 0.84rem;
+}
+
+.theme-classic {
+  --ux-shell-bg: rgba(255, 255, 255, 0.95);
+  --ux-panel-bg: #ffffff;
+  --ux-border: #cfd4da;
+  --ux-surface: #f7f8fa;
+  --ux-primary-text: #1a2027;
+  --ux-muted-text: #5f6b78;
+  --ux-mini-btn-bg: #1f2933;
+  --ux-video-bg: #0b1116;
+  --ux-line: #b4bdc7;
+  --ux-checkout-border: #1f7a4e;
+  --ux-checkout-gradient: linear-gradient(90deg, #1f7a4e 0%, #289d64 100%);
+  --ux-positive: #118243;
+  color: #10151b;
+}
+
+.theme-sunset {
+  --ux-shell-bg: rgba(43, 16, 26, 0.86);
+  --ux-panel-bg: rgba(54, 20, 32, 0.93);
+  --ux-border: #86455f;
+  --ux-surface: #4a1f34;
+  --ux-primary-text: #ffe7e7;
+  --ux-muted-text: #ffd1cf;
+  --ux-mini-btn-bg: #69324a;
+  --ux-video-bg: #280f17;
+  --ux-line: #9d5f72;
+  --ux-checkout-border: #e58553;
+  --ux-checkout-gradient: linear-gradient(90deg, #e58553 0%, #f2b15c 100%);
+  --ux-positive: #8cff9b;
+}
+
+.theme-mint {
+  --ux-shell-bg: rgba(14, 34, 32, 0.85);
+  --ux-panel-bg: rgba(18, 43, 40, 0.92);
+  --ux-border: #3e6f68;
+  --ux-surface: #1f4f48;
+  --ux-primary-text: #dff9f2;
+  --ux-muted-text: #b8ece0;
+  --ux-mini-btn-bg: #2f6660;
+  --ux-video-bg: #0f2422;
+  --ux-line: #5d9088;
+  --ux-checkout-border: #47be87;
+  --ux-checkout-gradient: linear-gradient(90deg, #37a977 0%, #5ed29a 100%);
+  --ux-positive: #91ffbd;
 }
 
 @media (min-width: 640px) {
