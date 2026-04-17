@@ -48,7 +48,9 @@ const UX_THEMES = [
   { id: "sunset", label: "UX Sunset" },
   { id: "mint", label: "UX Mint" }
 ];
-const TICKET_WIDTH = 32;
+const API_BASE_URL = (
+  import.meta.env.VITE_API_URL ?? "https://minisaas-ny4j.onrender.com"
+).replace(/\/$/, "");
 
 function hashCode(value) {
   return value.split("").reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -76,59 +78,6 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll('"', "&quot;")
     .replaceAll("'", "&#39;");
-}
-
-function fitText(value, max) {
-  if (value.length <= max) {
-    return value;
-  }
-  return `${value.slice(0, Math.max(0, max - 1))}…`;
-}
-
-function centerText(value, width = TICKET_WIDTH) {
-  const trimmed = fitText(value, width);
-  const totalPadding = Math.max(0, width - trimmed.length);
-  const left = Math.floor(totalPadding / 2);
-  const right = totalPadding - left;
-  return `${" ".repeat(left)}${trimmed}${" ".repeat(right)}`;
-}
-
-function lineSeparator(width = TICKET_WIDTH) {
-  return "-".repeat(width);
-}
-
-function moneyShort(value) {
-  const formatted = new Intl.NumberFormat("es-UY", {
-    maximumFractionDigits: 0
-  }).format(value);
-  return `$${formatted}`;
-}
-
-function buildPlainTicket(movement) {
-  const lines = [
-    centerText("SCANER"),
-    centerText("Ticket de venta"),
-    lineSeparator(),
-    `Fecha: ${movement.at}`,
-    lineSeparator(),
-    "Producto               Total"
-  ];
-
-  movement.products.forEach((product) => {
-    const left = fitText(`${product.qty}x ${product.name}`, 21).padEnd(21, " ");
-    const right = moneyShort(product.subtotal).padStart(11, " ");
-    lines.push(`${left}${right}`);
-  });
-
-  lines.push(lineSeparator());
-  lines.push(`${"TOTAL".padEnd(21, " ")}${moneyShort(movement.amount).padStart(11, " ")}`);
-  lines.push(lineSeparator());
-  lines.push(centerText("Gracias por su compra"));
-  lines.push("");
-  lines.push("");
-  lines.push("");
-
-  return lines.join("\n");
 }
 
 function getDemoProductFromCode(code) {
@@ -472,25 +421,36 @@ export function AlmacenScannerDemo() {
     popup.document.close();
   };
 
-  const printTicketRawBt = (movement) => {
-    if (!movement || typeof window === "undefined") {
+  const printTicketServer = async (movement) => {
+    if (!movement) {
       return;
     }
 
-    const rawText = buildPlainTicket(movement);
-    const encodedText = encodeURIComponent(rawText);
-    const directUrl = `rawbt://print?text=${encodedText}`;
-    const fallbackUrl = `intent://print/#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;S.text=${encodedText};end`;
-
-    setScanMessage("Enviando ticket a RawBT por red...");
+    setScanMessage("Enviando ticket al servidor...");
 
     try {
-      window.location.href = directUrl;
-      setTimeout(() => {
-        window.location.href = fallbackUrl;
-      }, 700);
-    } catch (_error) {
-      window.location.href = fallbackUrl;
+      const response = await fetch(`${API_BASE_URL}/api/print/ticket`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          at: movement.at,
+          amount: movement.amount,
+          products: movement.products.map((product) => ({
+            name: product.name,
+            qty: product.qty,
+            subtotal: product.subtotal
+          }))
+        })
+      });
+
+      if (!response.ok) {
+        const data = await response.json().catch(() => ({}));
+        throw new Error(data.detail || data.error || "Error imprimiendo por red.");
+      }
+
+      setScanMessage("Ticket enviado a impresora de red.");
+    } catch (error) {
+      setScanMessage(`Error de impresion: ${error.message}`);
     }
   };
 
@@ -664,9 +624,9 @@ export function AlmacenScannerDemo() {
                           <button
                             type="button"
                             className="mini-btn"
-                            onClick={() => printTicketRawBt(movement)}
+                            onClick={() => printTicketServer(movement)}
                           >
-                            Imprimir Red (RawBT)
+                            Imprimir Red (Servidor)
                           </button>
                           <button
                             type="button"

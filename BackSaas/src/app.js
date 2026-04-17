@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import { projectsRouter } from "./routes/projects.routes.js";
 import { env } from "./config/env.js";
+import { printRouter } from "./routes/print.routes.js";
 
 export const app = express();
 
@@ -17,3 +18,4 @@ app.get("/api/health", (_req, res) => {
 });
 
 app.use("/api/projects", projectsRouter);
+app.use("/api/print", printRouter);

@@ -65,8 +65,13 @@ Crear 2 servicios desde el mismo repo:
   - `NODE_ENV=production`
   - `DB_PATH=./data/minisaas.db`
   - `CORS_ORIGIN=https://TU-FRONTEND.onrender.com`
+  - `PRINTER_IP=192.168.1.217`
+  - `PRINTER_PORT=9100`
+  - `PRINTER_TIMEOUT_MS=5000`
 
 `PORT` lo inyecta Render automaticamente.
+
+El backend expone `POST /api/print/ticket` para imprimir por red (TCP RAW 9100) sin RawBT.
 
 ## Deploy Front en GitHub Pages
 
