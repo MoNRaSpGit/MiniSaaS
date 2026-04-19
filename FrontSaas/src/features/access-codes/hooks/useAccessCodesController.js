@@ -1,15 +1,15 @@
 import { useMemo } from "react";
 import { projects } from "../../../shared/data/projects";
 import {
-  buildMiniSaasBaseUrl,
+  buildMiniSaasWebUrl,
   buildProjectUrl,
   buildQrImageUrl
 } from "../lib/qrLinks";
 
 export function useAccessCodesController() {
-  const baseUrl = buildMiniSaasBaseUrl();
+  const baseUrl = buildMiniSaasWebUrl();
 
-  const catalogUrl = `${baseUrl}`;
+  const catalogUrl = baseUrl;
 
   const items = useMemo(
     () =>
