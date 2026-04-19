@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { getProjectBySlug, getPublicAssetUrl } from "../shared/data/projects";
 import { AlmacenScannerDemo } from "../features/almacen/AlmacenScannerDemo";
+import { CafeteriaDemo } from "../features/cafeteria/CafeteriaDemo";
 
 export function ProjectPage() {
   const { slug } = useParams();
@@ -21,6 +22,17 @@ export function ProjectPage() {
     return (
       <section className="detail-card detail-card-mobile">
         <AlmacenScannerDemo />
+        <Link to="/" className="back-link">
+          Volver al catalogo
+        </Link>
+      </section>
+    );
+  }
+
+  if (project.slug === "cafeteria") {
+    return (
+      <section className="detail-card detail-card-mobile">
+        <CafeteriaDemo />
         <Link to="/" className="back-link">
           Volver al catalogo
         </Link>

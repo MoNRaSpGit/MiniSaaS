@@ -24,12 +24,12 @@ export const projects = [
       "Planes mensuales, control de asistencia, pagos y seguimiento de alumnos."
   },
   {
-    slug: "restaurante",
-    name: "Restaurante",
-    category: "Pedidos",
+    slug: "cafeteria",
+    name: "Cafeteria",
+    category: "Pedidos + Caja",
     image: "images/restaurante.svg",
     description:
-      "Pedidos en mesa, cocina en tiempo real y control total de caja y delivery."
+      "Menu de cafe y postres, carrito rapido y panel de pedidos para despacho."
   },
   {
     slug: "clinica",
